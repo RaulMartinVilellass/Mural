@@ -437,6 +437,7 @@
   }
   .btn.on-dark:hover{background:var(--blush);}
   .btn.on-dark:disabled{background:rgba(255,255,255,0.4);color:#fff;}
+  #lightboxDelete:hover{background:var(--wine-dark);}
 
   /* ---------- Ajustes responsive para móvil ---------- */
   @media(max-width:600px){
@@ -558,6 +559,7 @@
     </div>
     <div class="lightbox-actions">
       <button class="btn on-dark" id="lightboxDownload">Descargar</button>
+      <button class="btn on-dark" id="lightboxDelete" style="background:#A24C5E;color:#fff;">Borrar</button>
     </div>
   </div>
 </div>
@@ -611,6 +613,9 @@ const lightboxWho = document.getElementById('lightboxWho');
 const lightboxWhen = document.getElementById('lightboxWhen');
 const lightboxCaption = document.getElementById('lightboxCaption');
 const lightboxDownload = document.getElementById('lightboxDownload');
+const lightboxDelete = document.getElementById('lightboxDelete');
+
+const DELETE_PASSWORD = 'CONFIRMAR';
 
 /* ---------- Nickname ---------- */
 function initNickname(){
@@ -731,6 +736,7 @@ function openLightbox(post){
   lightboxCaption.textContent = post.caption || '';
   lightboxCaption.style.display = post.caption ? 'block' : 'none';
   lightboxDownload.onclick = () => downloadMedia(post);
+  lightboxDelete.onclick = () => deletePost(post);
   lightboxOverlay.style.display = 'flex';
 }
 
@@ -769,6 +775,53 @@ async function downloadMedia(post){
   } finally {
     lightboxDownload.disabled = false;
     lightboxDownload.textContent = originalLabel;
+  }
+}
+
+/* ---------- Borrar foto/vídeo (con contraseña de confirmación) ---------- */
+async function deletePost(post){
+  const input = window.prompt('Para borrar esta foto, escribe la palabra de confirmación:');
+  if(input === null) return; // ha pulsado cancelar
+  if(input !== DELETE_PASSWORD){
+    alert('Contraseña incorrecta. No se ha borrado nada.');
+    return;
+  }
+
+  const originalLabel = lightboxDelete.textContent;
+  lightboxDelete.disabled = true;
+  lightboxDelete.textContent = 'Borrando…';
+  try {
+    // Extraer la ruta del archivo dentro del bucket a partir de la URL pública
+    const marker = `/object/public/${encodeURIComponent(BUCKET_NAME)}/`;
+    const altMarker = `/object/public/${BUCKET_NAME}/`;
+    let idx = post.url.indexOf(marker);
+    let usedMarker = marker;
+    if(idx === -1){
+      idx = post.url.indexOf(altMarker);
+      usedMarker = altMarker;
+    }
+    if(idx !== -1){
+      const storagePath = decodeURIComponent(post.url.slice(idx + usedMarker.length));
+      const { error: storageError } = await supabaseClient.storage
+        .from(BUCKET_NAME)
+        .remove([storagePath]);
+      if(storageError) console.error('Error borrando del storage:', storageError);
+    }
+
+    const { error: dbError } = await supabaseClient
+      .from('posts')
+      .delete()
+      .eq('id', post.id);
+    if(dbError) throw dbError;
+
+    closeLightbox();
+    await loadPosts();
+  } catch(err){
+    console.error(err);
+    alert('No se ha podido borrar. Revisa la consola o tu conexión.');
+  } finally {
+    lightboxDelete.disabled = false;
+    lightboxDelete.textContent = originalLabel;
   }
 }
 
