@@ -808,11 +808,16 @@ async function deletePost(post){
       if(storageError) console.error('Error borrando del storage:', storageError);
     }
 
-    const { error: dbError } = await supabaseClient
+    const { data: deletedRows, error: dbError } = await supabaseClient
       .from('posts')
       .delete()
-      .eq('id', post.id);
+      .eq('id', post.id)
+      .select();
     if(dbError) throw dbError;
+    if(!deletedRows || deletedRows.length === 0){
+      alert('No se ha borrado: falta el permiso (RLS) de DELETE en la tabla "posts" en Supabase.');
+      return;
+    }
 
     closeLightbox();
     await loadPosts();
