@@ -1,0 +1,863 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Marian & Borao</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=Work+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --cream:#FAF3EC;
+    --blush:#F0DCD3;
+    --wine:#A24C5E;
+    --wine-dark:#7E3A48;
+    --sage:#6E7F5C;
+    --ink:#2E2A25;
+    --ink-soft:#6B635A;
+    --line:#E4D5C9;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:var(--cream);
+    color:var(--ink);
+    font-family:'Work Sans',sans-serif;
+    min-height:100vh;
+  }
+  .display{
+    font-family:'Cormorant Garamond',serif;
+  }
+
+  /* ---------- Hero ---------- */
+  header.hero{
+    text-align:center;
+    padding:56px 20px 28px;
+    border-bottom:1px solid var(--line);
+    background:
+      radial-gradient(ellipse at 50% 0%, var(--blush) 0%, transparent 60%),
+      var(--cream);
+  }
+  .hero .names{
+    font-family:'Cormorant Garamond',serif;
+    font-weight:500;
+    font-style:italic;
+    font-size:clamp(2.6rem,7vw,4.2rem);
+    color:var(--wine-dark);
+    letter-spacing:0.01em;
+    margin:0;
+    line-height:1.05;
+  }
+  .hero .amp{
+    color:var(--sage);
+    font-style:normal;
+    padding:0 6px;
+  }
+  .hero .sub{
+    margin-top:10px;
+    color:var(--ink-soft);
+    font-size:0.98rem;
+    letter-spacing:0.04em;
+  }
+  .hero .whoami{
+    margin-top:18px;
+    font-size:0.85rem;
+    color:var(--ink-soft);
+  }
+  .hero .whoami button{
+    background:none;
+    border:none;
+    color:var(--wine);
+    text-decoration:underline;
+    font:inherit;
+    cursor:pointer;
+    padding:0;
+  }
+
+  /* ---------- Tabs ---------- */
+  nav.tabs{
+    display:flex;
+    justify-content:center;
+    gap:4px;
+    margin:26px auto 0;
+    max-width:420px;
+    border-bottom:1px solid var(--line);
+  }
+  nav.tabs button{
+    flex:1;
+    background:none;
+    border:none;
+    padding:14px 10px;
+    font-family:'Work Sans',sans-serif;
+    font-size:0.98rem;
+    color:var(--ink-soft);
+    cursor:pointer;
+    position:relative;
+    transition:color .2s ease;
+  }
+  nav.tabs button.active{
+    color:var(--wine-dark);
+    font-weight:600;
+  }
+  nav.tabs button.active::after{
+    content:"";
+    position:absolute;
+    left:14%;
+    right:14%;
+    bottom:-1px;
+    height:2px;
+    background:var(--wine);
+  }
+
+  main{
+    max-width:1080px;
+    margin:0 auto;
+    padding:28px 20px 90px;
+  }
+
+  /* ---------- Upload bar ---------- */
+  .upload-bar{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:14px;
+    margin-bottom:26px;
+    flex-wrap:wrap;
+  }
+  .upload-bar h2{
+    font-family:'Cormorant Garamond',serif;
+    font-weight:500;
+    font-size:1.7rem;
+    margin:0;
+    color:var(--ink);
+  }
+  .upload-bar .count{
+    color:var(--ink-soft);
+    font-size:0.88rem;
+    font-weight:400;
+    margin-left:8px;
+  }
+  .btn{
+    background:var(--wine);
+    color:#fff;
+    border:none;
+    padding:12px 20px;
+    border-radius:2px;
+    font-family:'Work Sans',sans-serif;
+    font-size:0.92rem;
+    font-weight:500;
+    cursor:pointer;
+    transition:background .2s ease;
+    letter-spacing:0.01em;
+    -webkit-tap-highlight-color:transparent;
+  }
+  .btn:hover{background:var(--wine-dark);}
+  .btn:disabled{background:#C9BBB2;cursor:not-allowed;}
+  input[type=file]{display:none;}
+
+  /* ---------- Mural en cuadrícula uniforme ---------- */
+  .mural{
+    display:grid;
+    grid-template-columns:repeat(4,1fr);
+    gap:14px;
+  }
+  @media(max-width:980px){.mural{grid-template-columns:repeat(3,1fr);}}
+  @media(max-width:680px){.mural{grid-template-columns:repeat(2,1fr);}}
+  @media(max-width:420px){.mural{grid-template-columns:repeat(2,1fr);gap:10px;}}
+
+  .card{
+    background:#fff;
+    border:1px solid var(--line);
+    overflow:hidden;
+    position:relative;
+    display:flex;
+    flex-direction:column;
+  }
+  .card .media{
+    position:relative;
+    width:100%;
+    aspect-ratio:1/1;
+    overflow:hidden;
+    cursor:pointer;
+    background:var(--blush);
+  }
+  .card .media img, .card .media video{
+    width:100%;
+    height:100%;
+    object-fit:cover;
+    display:block;
+    transition:transform .35s ease;
+  }
+  .card .media:hover img,
+  .card .media:hover video{
+    transform:scale(1.05);
+  }
+  .card .media .zoom-hint{
+    position:absolute;
+    top:8px;
+    right:8px;
+    width:28px;
+    height:28px;
+    border-radius:50%;
+    background:rgba(46,42,37,0.55);
+    color:#fff;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size:0.9rem;
+    opacity:0;
+    transition:opacity .2s ease;
+    pointer-events:none;
+  }
+  .card .media:hover .zoom-hint{opacity:1;}
+  .card .media .video-badge{
+    position:absolute;
+    bottom:8px;
+    left:8px;
+    background:rgba(46,42,37,0.6);
+    color:#fff;
+    font-size:0.68rem;
+    padding:3px 7px;
+    border-radius:2px;
+    letter-spacing:0.03em;
+  }
+  .card .meta{
+    padding:10px 12px 12px;
+  }
+  .card .who{
+    font-weight:600;
+    font-size:0.86rem;
+    color:var(--wine-dark);
+  }
+  .card .when{
+    font-size:0.74rem;
+    color:var(--ink-soft);
+    margin-top:2px;
+  }
+  .card .caption{
+    font-size:0.85rem;
+    color:var(--ink);
+    margin-top:6px;
+    line-height:1.4;
+  }
+
+  .empty{
+    text-align:center;
+    padding:60px 20px;
+    color:var(--ink-soft);
+  }
+  .empty .display{
+    font-size:1.6rem;
+    color:var(--wine-dark);
+    display:block;
+    margin-bottom:8px;
+  }
+
+  .status{
+    text-align:center;
+    padding:40px;
+    color:var(--ink-soft);
+    font-size:0.9rem;
+  }
+
+  /* ---------- Nickname modal ---------- */
+  .overlay{
+    position:fixed;inset:0;
+    background:rgba(46,42,37,0.55);
+    display:flex;align-items:center;justify-content:center;
+    z-index:50;
+    padding:20px;
+  }
+  .modal{
+    background:var(--cream);
+    max-width:380px;
+    width:100%;
+    padding:36px 30px;
+    text-align:center;
+    border:1px solid var(--line);
+  }
+  .modal .display{
+    font-size:1.9rem;
+    color:var(--wine-dark);
+    font-style:italic;
+    margin:0 0 6px;
+  }
+  .modal p{
+    color:var(--ink-soft);
+    font-size:0.9rem;
+    margin:0 0 22px;
+    line-height:1.5;
+  }
+  .modal input{
+    width:100%;
+    padding:12px 14px;
+    border:1px solid var(--line);
+    background:#fff;
+    font-family:'Work Sans',sans-serif;
+    font-size:1rem;
+    margin-bottom:14px;
+  }
+  .modal input:focus{outline:2px solid var(--sage);outline-offset:1px;}
+
+  /* ---------- Upload modal ---------- */
+  .modal.upload-modal{max-width:420px;text-align:left;}
+  .modal.upload-modal .display{text-align:center;}
+  .modal.upload-modal textarea{
+    width:100%;
+    padding:12px 14px;
+    border:1px solid var(--line);
+    background:#fff;
+    font-family:'Work Sans',sans-serif;
+    font-size:0.95rem;
+    resize:vertical;
+    min-height:70px;
+    margin-bottom:14px;
+  }
+  .picker{
+    border:1.5px dashed var(--line);
+    padding:24px;
+    text-align:center;
+    cursor:pointer;
+    margin-bottom:16px;
+    color:var(--ink-soft);
+    font-size:0.9rem;
+    transition:border-color .2s ease;
+  }
+  .picker:hover{border-color:var(--wine);}
+  .preview-list{
+    display:flex;
+    gap:8px;
+    flex-wrap:wrap;
+    margin-bottom:14px;
+  }
+  .preview-list .thumb{
+    width:64px;height:64px;
+    object-fit:cover;
+    border:1px solid var(--line);
+  }
+  .modal-actions{display:flex;gap:10px;justify-content:flex-end;}
+  .btn.ghost{
+    background:none;
+    color:var(--ink-soft);
+    border:1px solid var(--line);
+  }
+  .btn.ghost:hover{background:var(--blush);}
+
+  .progress{
+    font-size:0.82rem;
+    color:var(--ink-soft);
+    margin-top:8px;
+  }
+
+  footer{
+    text-align:center;
+    padding:30px 20px;
+    color:var(--ink-soft);
+    font-size:0.8rem;
+    border-top:1px solid var(--line);
+  }
+
+  /* ---------- Lightbox ---------- */
+  .lightbox-overlay{
+    position:fixed;inset:0;
+    background:rgba(20,16,13,0.94);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    z-index:200;
+    padding:24px;
+  }
+  .lightbox-close{
+    position:absolute;
+    top:18px;
+    right:22px;
+    width:40px;height:40px;
+    border-radius:50%;
+    border:1px solid rgba(255,255,255,0.35);
+    background:rgba(255,255,255,0.08);
+    color:#fff;
+    font-size:1.3rem;
+    line-height:1;
+    cursor:pointer;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    transition:background .2s ease;
+  }
+  .lightbox-close:hover{background:rgba(255,255,255,0.2);}
+  .lightbox-content{
+    max-width:min(92vw,880px);
+    width:100%;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    gap:16px;
+  }
+  .lightbox-media{
+    width:100%;
+    max-height:72vh;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+  }
+  .lightbox-media img, .lightbox-media video{
+    max-width:100%;
+    max-height:72vh;
+    object-fit:contain;
+    box-shadow:0 14px 50px rgba(0,0,0,0.5);
+    border-radius:2px;
+  }
+  .lightbox-info{
+    text-align:center;
+    color:#fff;
+  }
+  .lightbox-info .who{
+    font-weight:600;
+    font-size:0.95rem;
+    color:var(--blush);
+  }
+  .lightbox-info .when{
+    font-size:0.76rem;
+    color:rgba(255,255,255,0.6);
+    margin-top:2px;
+  }
+  .lightbox-info .caption{
+    font-size:0.9rem;
+    color:rgba(255,255,255,0.9);
+    margin-top:8px;
+    max-width:480px;
+    line-height:1.45;
+  }
+  .lightbox-actions{
+    display:flex;
+    gap:10px;
+  }
+  .btn.on-dark{
+    background:#fff;
+    color:var(--wine-dark);
+  }
+  .btn.on-dark:hover{background:var(--blush);}
+  .btn.on-dark:disabled{background:rgba(255,255,255,0.4);color:#fff;}
+
+  /* ---------- Ajustes responsive para móvil ---------- */
+  @media(max-width:600px){
+    header.hero{padding:40px 18px 22px;}
+    .hero .sub{font-size:0.9rem;}
+    .hero .whoami{font-size:0.8rem;}
+    nav.tabs{max-width:100%;margin-top:20px;}
+    nav.tabs button{padding:12px 8px;font-size:0.92rem;}
+    main{padding:22px 14px 70px;}
+    .upload-bar{
+      flex-direction:column;
+      align-items:stretch;
+      gap:12px;
+      margin-bottom:20px;
+    }
+    .upload-bar h2{font-size:1.45rem;text-align:center;}
+    .upload-bar #openUploadBtn{width:100%;padding:13px 20px;}
+    .mural{gap:8px;}
+    .card .who{font-size:0.82rem;}
+    .card .when{font-size:0.7rem;}
+    .card .caption{font-size:0.82rem;}
+    .card .meta{padding:8px 10px 10px;}
+    .overlay{padding:14px;}
+    .modal{padding:28px 20px;}
+    .modal .display{font-size:1.7rem;}
+    .modal.upload-modal{padding:24px 18px;}
+    .picker{padding:20px 14px;font-size:0.86rem;}
+    .modal-actions .btn{flex:1;}
+    footer{padding:24px 16px;font-size:0.76rem;}
+
+    .lightbox-overlay{
+      padding:14px;
+      padding-top:calc(14px + env(safe-area-inset-top));
+      padding-bottom:calc(14px + env(safe-area-inset-bottom));
+    }
+    .lightbox-close{
+      top:calc(10px + env(safe-area-inset-top));
+      right:12px;
+      width:36px;height:36px;
+      font-size:1.15rem;
+    }
+    .lightbox-content{gap:12px;}
+    .lightbox-media{max-height:58vh;}
+    .lightbox-media img, .lightbox-media video{max-height:58vh;}
+    .lightbox-info .caption{font-size:0.85rem;max-width:100%;}
+    .lightbox-actions{width:100%;}
+    .lightbox-actions .btn{flex:1;padding:13px 16px;}
+  }
+
+  @media(max-width:360px){
+    .hero .names{font-size:2.3rem;}
+    .mural{grid-template-columns:repeat(2,1fr);gap:6px;}
+  }
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <p class="names display">Marian <span class="amp">&amp;</span> Borao</p>
+  <p class="sub">Comparte tus fotos y vídeos de nuestra boda</p>
+  <p class="whoami" id="whoamiLine"></p>
+</header>
+
+<nav class="tabs">
+  <button id="tabMural" class="active">Mural</button>
+  <button id="tabProfile">Mi perfil</button>
+</nav>
+
+<main>
+  <div class="upload-bar">
+    <h2 id="sectionTitle">El mural <span class="count" id="countLabel"></span></h2>
+    <button class="btn" id="openUploadBtn">+ Subir foto o vídeo</button>
+  </div>
+  <div id="grid" class="mural"></div>
+  <div id="emptyState" class="empty" style="display:none;">
+    <span class="display">Todavía no hay nada aquí</span>
+    Sé el primero en compartir un recuerdo de la boda.
+  </div>
+  <div id="statusMsg" class="status">Cargando el mural…</div>
+</main>
+
+<footer>Con cariño, para el recuerdo de este día.</footer>
+
+<!-- Nickname modal -->
+<div class="overlay" id="nicknameOverlay">
+  <div class="modal">
+    <p class="display">Bienvenido/a</p>
+    <p>Dinos tu nombre para que sepamos de quién son las fotos que subas.</p>
+    <input type="text" id="nicknameInput" placeholder="Tu nombre" maxlength="30" autocomplete="off">
+    <button class="btn" id="nicknameSubmit" style="width:100%;">Entrar al mural</button>
+  </div>
+</div>
+
+<!-- Upload modal -->
+<div class="overlay" id="uploadOverlay" style="display:none;">
+  <div class="modal upload-modal">
+    <p class="display">Compartir un recuerdo</p>
+    <div class="picker" id="pickerZone">Toca para elegir fotos o vídeos<br>(puedes seleccionar varios)</div>
+    <input type="file" id="fileInput" accept="image/*,video/*" multiple>
+    <div class="preview-list" id="previewList"></div>
+    <textarea id="captionInput" placeholder="Añade un comentario (opcional)"></textarea>
+    <div class="progress" id="uploadProgress"></div>
+    <div class="modal-actions">
+      <button class="btn ghost" id="cancelUploadBtn">Cancelar</button>
+      <button class="btn" id="confirmUploadBtn">Subir</button>
+    </div>
+  </div>
+</div>
+
+<!-- Lightbox: ver foto/vídeo ampliado -->
+<div class="lightbox-overlay" id="lightboxOverlay" style="display:none;">
+  <button class="lightbox-close" id="lightboxClose" aria-label="Cerrar">&times;</button>
+  <div class="lightbox-content">
+    <div class="lightbox-media" id="lightboxMedia"></div>
+    <div class="lightbox-info">
+      <div class="who" id="lightboxWho"></div>
+      <div class="when" id="lightboxWhen"></div>
+      <div class="caption" id="lightboxCaption"></div>
+    </div>
+    <div class="lightbox-actions">
+      <button class="btn on-dark" id="lightboxDownload">Descargar</button>
+    </div>
+  </div>
+</div>
+
+<!-- Cliente de Supabase -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<script>
+/* =========================================================
+   1) CONFIGURA AQUÍ TU PROYECTO DE SUPABASE
+   Sigue las instrucciones del README para obtener estos datos.
+   ========================================================= */
+const SUPABASE_URL = "https://igjsjqnftbfwbjajaqkh.supabase.co";
+const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImlnanNqcW5mdGJmd2JqYWphcWtoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODkwNTg5MjAsImV4cCI6MjEwNDYzNDkyMH0.qCblJDWjNqx8ghiUgy0XJx874kCBSHsYDTgFLf6guAw";
+const BUCKET_NAME = "foto boda";
+
+const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+/* ---------- Estado ---------- */
+let nickname = localStorage.getItem('boda_nickname') || '';
+let currentTab = 'mural'; // 'mural' | 'profile'
+let allPosts = [];
+let selectedFiles = [];
+
+/* ---------- Elementos ---------- */
+const nicknameOverlay = document.getElementById('nicknameOverlay');
+const nicknameInput = document.getElementById('nicknameInput');
+const whoamiLine = document.getElementById('whoamiLine');
+const tabMural = document.getElementById('tabMural');
+const tabProfile = document.getElementById('tabProfile');
+const sectionTitle = document.getElementById('sectionTitle');
+const countLabel = document.getElementById('countLabel');
+const grid = document.getElementById('grid');
+const emptyState = document.getElementById('emptyState');
+const statusMsg = document.getElementById('statusMsg');
+
+const uploadOverlay = document.getElementById('uploadOverlay');
+const openUploadBtn = document.getElementById('openUploadBtn');
+const cancelUploadBtn = document.getElementById('cancelUploadBtn');
+const confirmUploadBtn = document.getElementById('confirmUploadBtn');
+const pickerZone = document.getElementById('pickerZone');
+const fileInput = document.getElementById('fileInput');
+const previewList = document.getElementById('previewList');
+const captionInput = document.getElementById('captionInput');
+const uploadProgress = document.getElementById('uploadProgress');
+
+const lightboxOverlay = document.getElementById('lightboxOverlay');
+const lightboxClose = document.getElementById('lightboxClose');
+const lightboxMedia = document.getElementById('lightboxMedia');
+const lightboxWho = document.getElementById('lightboxWho');
+const lightboxWhen = document.getElementById('lightboxWhen');
+const lightboxCaption = document.getElementById('lightboxCaption');
+const lightboxDownload = document.getElementById('lightboxDownload');
+
+/* ---------- Nickname ---------- */
+function initNickname(){
+  if(nickname){
+    whoamiLine.innerHTML = `Has entrado como <strong>${escapeHtml(nickname)}</strong> · <button id="changeNick">cambiar</button>`;
+    document.getElementById('changeNick').onclick = () => {
+      nicknameOverlay.style.display = 'flex';
+      nicknameInput.value = nickname;
+    };
+  } else {
+    nicknameOverlay.style.display = 'flex';
+  }
+}
+document.getElementById('nicknameSubmit').onclick = saveNickname;
+nicknameInput.addEventListener('keydown', e => { if(e.key === 'Enter') saveNickname(); });
+
+function saveNickname(){
+  const val = nicknameInput.value.trim();
+  if(!val) return;
+  nickname = val;
+  localStorage.setItem('boda_nickname', nickname);
+  nicknameOverlay.style.display = 'none';
+  whoamiLine.innerHTML = `Has entrado como <strong>${escapeHtml(nickname)}</strong> · <button id="changeNick">cambiar</button>`;
+  document.getElementById('changeNick').onclick = () => {
+    nicknameOverlay.style.display = 'flex';
+    nicknameInput.value = nickname;
+  };
+  renderGrid();
+}
+
+/* ---------- Tabs ---------- */
+tabMural.onclick = () => switchTab('mural');
+tabProfile.onclick = () => switchTab('profile');
+
+function switchTab(tab){
+  currentTab = tab;
+  tabMural.classList.toggle('active', tab === 'mural');
+  tabProfile.classList.toggle('active', tab === 'profile');
+  sectionTitle.textContent = tab === 'mural' ? 'El mural' : 'Mis fotos y vídeos';
+  renderGrid();
+}
+
+/* ---------- Supabase: cargar el mural y escuchar cambios en tiempo real ---------- */
+statusMsg.style.display = 'block';
+
+async function loadPosts(){
+  const { data, error } = await supabaseClient
+    .from('posts')
+    .select('*')
+    .order('created_at', { ascending: false });
+  if(error){
+    console.error(error);
+    statusMsg.textContent = 'No se pudo conectar con el mural. Revisa la configuración de Supabase.';
+    return;
+  }
+  allPosts = data;
+  statusMsg.style.display = 'none';
+  renderGrid();
+}
+loadPosts();
+
+// Tiempo real: cuando alguien sube algo nuevo, se actualiza el mural de todos
+supabaseClient
+  .channel('posts-changes')
+  .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'posts' }, () => {
+    loadPosts();
+  })
+  .subscribe();
+
+function renderGrid(){
+  const posts = currentTab === 'mural'
+    ? allPosts
+    : allPosts.filter(p => p.nickname === nickname);
+
+  countLabel.textContent = posts.length ? `(${posts.length})` : '';
+  grid.innerHTML = '';
+
+  if(posts.length === 0){
+    emptyState.style.display = 'block';
+    return;
+  }
+  emptyState.style.display = 'none';
+
+  posts.forEach((p, idx) => {
+    const card = document.createElement('div');
+    card.className = 'card';
+    const media = p.type === 'video'
+      ? `<video src="${p.url}" muted playsinline preload="metadata"></video><span class="video-badge">▶ vídeo</span>`
+      : `<img src="${p.url}" alt="Foto de ${escapeHtml(p.nickname)}" loading="lazy">`;
+    const when = p.created_at
+      ? new Date(p.created_at).toLocaleString('es-ES', { day:'numeric', month:'short', hour:'2-digit', minute:'2-digit' })
+      : '';
+    card.innerHTML = `
+      <div class="media" data-idx="${idx}">
+        ${media}
+        <span class="zoom-hint">⤢</span>
+      </div>
+      <div class="meta">
+        <div class="who">${escapeHtml(p.nickname)}</div>
+        <div class="when">${when}</div>
+        ${p.caption ? `<div class="caption">${escapeHtml(p.caption)}</div>` : ''}
+      </div>`;
+    card.querySelector('.media').addEventListener('click', () => openLightbox(p));
+    grid.appendChild(card);
+  });
+}
+
+/* ---------- Lightbox: ampliar foto/vídeo y descargar ---------- */
+function openLightbox(post){
+  const when = post.created_at
+    ? new Date(post.created_at).toLocaleString('es-ES', { day:'numeric', month:'short', year:'numeric', hour:'2-digit', minute:'2-digit' })
+    : '';
+  lightboxMedia.innerHTML = post.type === 'video'
+    ? `<video src="${post.url}" controls autoplay playsinline></video>`
+    : `<img src="${post.url}" alt="Foto de ${escapeHtml(post.nickname)}">`;
+  lightboxWho.textContent = post.nickname || '';
+  lightboxWhen.textContent = when;
+  lightboxCaption.textContent = post.caption || '';
+  lightboxCaption.style.display = post.caption ? 'block' : 'none';
+  lightboxDownload.onclick = () => downloadMedia(post);
+  lightboxOverlay.style.display = 'flex';
+}
+
+function closeLightbox(){
+  lightboxOverlay.style.display = 'none';
+  lightboxMedia.innerHTML = '';
+}
+lightboxClose.onclick = closeLightbox;
+lightboxOverlay.addEventListener('click', (e) => {
+  if(e.target === lightboxOverlay) closeLightbox();
+});
+document.addEventListener('keydown', (e) => {
+  if(e.key === 'Escape' && lightboxOverlay.style.display === 'flex') closeLightbox();
+});
+
+async function downloadMedia(post){
+  const originalLabel = lightboxDownload.textContent;
+  lightboxDownload.disabled = true;
+  lightboxDownload.textContent = 'Descargando…';
+  try {
+    const response = await fetch(post.url);
+    const blob = await response.blob();
+    const ext = post.type === 'video' ? 'mp4' : 'jpg';
+    const nameGuess = post.url.split('/').pop().split('?')[0] || `boda_${post.nickname}.${ext}`;
+    const a = document.createElement('a');
+    const objectUrl = URL.createObjectURL(blob);
+    a.href = objectUrl;
+    a.download = nameGuess;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    URL.revokeObjectURL(objectUrl);
+  } catch(err){
+    console.error(err);
+    window.open(post.url, '_blank');
+  } finally {
+    lightboxDownload.disabled = false;
+    lightboxDownload.textContent = originalLabel;
+  }
+}
+
+/* ---------- Modal de subida ---------- */
+openUploadBtn.onclick = () => {
+  if(!nickname){ nicknameOverlay.style.display = 'flex'; return; }
+  uploadOverlay.style.display = 'flex';
+};
+cancelUploadBtn.onclick = closeUploadModal;
+function closeUploadModal(){
+  uploadOverlay.style.display = 'none';
+  selectedFiles = [];
+  previewList.innerHTML = '';
+  captionInput.value = '';
+  uploadProgress.textContent = '';
+  fileInput.value = '';
+}
+
+pickerZone.onclick = () => fileInput.click();
+fileInput.onchange = () => {
+  selectedFiles = Array.from(fileInput.files);
+  previewList.innerHTML = '';
+  selectedFiles.forEach(file => {
+    if(file.type.startsWith('image/')){
+      const img = document.createElement('img');
+      img.className = 'thumb';
+      img.src = URL.createObjectURL(file);
+      previewList.appendChild(img);
+    } else {
+      const tag = document.createElement('div');
+      tag.className = 'thumb';
+      tag.style.cssText = 'display:flex;align-items:center;justify-content:center;font-size:0.7rem;background:#eee;color:#666;';
+      tag.textContent = 'vídeo';
+      previewList.appendChild(tag);
+    }
+  });
+};
+
+confirmUploadBtn.onclick = async () => {
+  if(!nickname){ nicknameOverlay.style.display = 'flex'; return; }
+  if(selectedFiles.length === 0){ uploadProgress.textContent = 'Elige al menos un archivo.'; return; }
+
+  confirmUploadBtn.disabled = true;
+  const caption = captionInput.value.trim();
+
+  for(let i = 0; i < selectedFiles.length; i++){
+    const file = selectedFiles[i];
+    uploadProgress.textContent = `Subiendo ${i+1} de ${selectedFiles.length}…`;
+    try {
+      const path = `${nickname}/${Date.now()}_${file.name}`;
+      const { error: uploadError } = await supabaseClient.storage
+        .from(BUCKET_NAME)
+        .upload(path, file);
+      if(uploadError) throw uploadError;
+
+      const { data: urlData } = supabaseClient.storage
+        .from(BUCKET_NAME)
+        .getPublicUrl(path);
+
+      const { error: insertError } = await supabaseClient
+        .from('posts')
+        .insert({
+          nickname,
+          url: urlData.publicUrl,
+          type: file.type.startsWith('video/') ? 'video' : 'image',
+          caption
+        });
+      if(insertError) throw insertError;
+
+      await loadPosts();
+    } catch(err){
+      console.error(err);
+      uploadProgress.textContent = 'Error al subir. Revisa tu conexión e inténtalo de nuevo.';
+      confirmUploadBtn.disabled = false;
+      return;
+    }
+  }
+  confirmUploadBtn.disabled = false;
+  closeUploadModal();
+};
+
+function escapeHtml(str){
+  const div = document.createElement('div');
+  div.textContent = str || '';
+  return div.innerHTML;
+}
+
+initNickname();
+</script>
+</body>
+</html>
